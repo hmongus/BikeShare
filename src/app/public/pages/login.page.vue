@@ -1,0 +1,302 @@
+<script>
+import httpInstance from "@/app/shared/services/http.instance.js";
+import {Form} from "@primevue/forms";
+import useAuthStore from "@/app/shared/auth/stores/auth.store.js";
+import {$t} from "@primeuix/styled";
+import i18n from "@/i18n.js";
+import * as Yup from "yup";
+export default {
+  name: "app-login-page",
+  data(){
+    return {
+      schema: Yup.object().shape({
+        email: Yup.string().required("Email is required"),
+        password: Yup.string().required("Password is required"),
+      }),
+    };
+  },
+  methods:{
+    $t,
+    switchLanguage(language){
+      this.$i18n.locale = language;
+    },
+    onForgotPassword(){
+      this.$router.push("/forgot-password");
+    },
+    async onSubmit(values){
+      if(!this.email || !this.password){
+        alert(this.$t("Login.ErrorEmptyFields"));
+        return;
+      }else {
+        try {
+          const authStore = useAuthStore();
+          const {email, password} = values;
+          await authStore.login(email, password);
+        } catch (error) {
+          alert(error.message);
+        }
+      }
+
+    },
+    toRegister(){
+      this.$router.push("/register");
+    }
+  }
+}
+</script>
+<template>
+  <div class="login-wrapper">
+    <div class="login-left">
+      <img src="/src/assets/img/principal-logo.png" alt="BikeShare Logo"/>
+      <h2>{{$t('Login.WelcomeTitle')}} <span>BikeShare</span> </h2>
+      <p> {{$t('LoginTagline')}}</p>
+    </div>
+
+    <div class="login-right">
+      <div class="language-switcher">
+        <button @click="switchLanguage('es')" :class="{ active: this.$i18n.locale === 'es' }">ES</button>
+        <button @click="switchLanguage('en')" :class="{ active: this.$i18n.locale === 'en'}">EN</button>
+      </div>
+      <form @submit="onSubmit" :validation-schema="schema">
+        <h3>{{$t('Login.SignIn')}}</h3>
+        <label for="email"> {{$t('Login.EmailLabel')}}</label>
+        <input type="email" name="email" id="email" :placeholder="'Login.EmailPlaceholder'">
+
+        <label for="password">{{$t('Login.PasswordLabel')}}</label>
+        <input type="password" name="password" id="password" :placeholder="'Login.PasswordPlaceholder'">
+
+        <div class="forgot-password">
+          <a @click="onForgotPassword" class="link-button">{{$t('Login.ForgotPassword')}}</a>
+        </div>
+
+        <button type="submit" class="btn-signin">{{$t('Login.SignInBtn')}}</button>
+
+        <div class="signup-text">
+          {{$t('Login.NoAccount')}}
+          <button type="button"  class="link-button" @click="toRegister">{{$t('Login.SignUp')}}</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</template>
+<style scoped>
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+
+.login-wrapper {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+
+.login-left {
+  flex: 1;
+  background-color: #fdd187;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  height: 100%;
+  text-align: center;
+}
+
+.login-left img {
+  width: 300px;
+  margin-bottom: 20px;
+}
+
+.login-left h2 {
+  color: #555;
+  font-size: 1.8rem;
+}
+
+.login-left span {
+  color: #5f8ce0;
+}
+
+.login-left p {
+  font-size: 1rem;
+  color: #333;
+}
+
+
+.login-right {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  overflow: hidden;
+}
+
+form {
+  width: 100%;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+}
+
+label {
+  font-size: 0.9rem;
+  margin-bottom: 5px;
+  color: #333;
+}
+
+input {
+  padding: 10px;
+  margin-bottom: 15px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.forgot-password {
+  text-align: right;
+  margin-bottom: 15px;
+}
+
+.forgot-password a {
+  font-size: 0.8rem;
+  color: #888;
+  text-decoration: none;
+}
+
+.btn-signin {
+  background-color: #5f8ce0;
+  color: white;
+  padding: 10px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-bottom: 20px;
+}
+
+.or-divider {
+  text-align: center;
+  font-size: 0.9rem;
+  color: #aaa;
+  margin-bottom: 15px;
+}
+
+.social-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.social-buttons button {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background-size: 22px;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-color: #f0f0f0;
+  cursor: pointer;
+}
+
+button.google {
+  background-image: url('https://cdn-icons-png.flaticon.com/512/281/281764.png');
+}
+
+button.apple {
+  background-image: url('https://cdn-icons-png.flaticon.com/512/831/831276.png');
+}
+
+button.facebook {
+  background-image: url('https://cdn-icons-png.flaticon.com/512/733/733547.png');
+}
+
+.signup-text {
+  text-align: center;
+  font-size: 0.85rem;
+  color: #333;
+}
+
+.signup-text a {
+  text-decoration: none;
+  color: #5f8ce0;
+  font-weight: 600;
+}
+
+.repair-btn {
+  margin-top: 20px;
+  background-color: #dce5ff;
+  border: none;
+  padding: 10px;
+  font-size: 0.85rem;
+  color: #333;
+  border-radius: 5px;
+  cursor: pointer;
+  line-height: 1.4;
+}
+.link-button {
+  background: none;
+  border: none;
+  padding: 0;
+  margin-left: 4px;
+  color: #5f8ce0;
+  text-decoration: underline;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+.login-right {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  overflow: hidden;
+  position: relative;
+}
+
+.language-switcher {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  gap: 10px;
+}
+
+.language-switcher button {
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  color: #555;
+}
+
+.language-switcher button.active {
+  background-color: #5f8ce0;
+  color: white;
+  border-color: #5f8ce0;
+}
+
+.forgot-password a.link-button {
+  font-size: 0.8rem;
+  color: #888;
+  text-decoration: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.forgot-password a.link-button:hover {
+  text-decoration: underline;
+}
+
+</style>
